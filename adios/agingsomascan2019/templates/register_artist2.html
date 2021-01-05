@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block script %}
+{% endblock %}
+
+{% block js %}
+  $("#cf_password").focusout(function(){
+    if ($("#id_password").val() != $("#cf_password").val()){
+      $('#modal_msg').html('<b>암호</b>와 <b>암호확인</b>이 다릅니다.');
+      $('.ui.mini.modal').modal('show');
+    }
+  });
+
+  $("#confirm").click(function() {
+    flag = true;
+
+    if ($.trim($("#id_email").val()) == ''){
+      $('#modal_msg').html('<b>이메일</b> 입력은 필수입니다. <b>이메일</b>을 입력해 주세요.');
+      $('.ui.mini.modal').modal('show');
+      $("#id_email").focus();
+      flag = false;
+    }else if ($.trim($("#id_password").val()) == ''){
+      $('#modal_msg').html('<b>암호</b> 입력은 필수입니다. <b>암호</b>를 입력해 주세요.');
+      $('.ui.mini.modal').modal('show');
+      $("#id_password").focus();
+      flag = false;
+    }else if ($("#id_password").val() != $("#cf_password").val()){
+      $('#modal_msg').html('<b>암호</b>와 <b>암호확인</b>이 다릅니다.');
+      $('.ui.mini.modal').modal('show');
+      $("#id_password").focus();
+      flag = false;
+    }
+
+    if (flag){
+      $( "#form1" ).submit();
+    };
+  });
+
+  $("#back").click(function() {
+    window.history.back();
+  });
+
+  $("#cancle").click(function() {
+    window.location = '/';
+  });
+{% endblock %}
+
+{% block title %}{{TITLE}}{% endblock %}
+
+{% block content %}
+
+
+
+<div class="ui mini modal">
+  <i class="close icon"></i>
+  <div class="header">
+    작가 이메일 등록
+  </div>
+  <div class="content">
+    <div class="description">
+      <span id="modal_msg"></span>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="ui positive left labeled icon button">
+      확인
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<div class="ui aligned container">
+
+
+  <div class="ui small breadcrumb">
+    <a class="section" href="/">홈</a>
+    <span class="divider">/</span>
+    <a class="section">작가</a>
+    <span class="divider">/</span>
+    <div class="active section">작가 등록</div>
+  </div>
+
+  <h1 class="ui dividing header">작가 등록</h1>
+
+  <div class="ui ordered five top attached steps">
+    <a class="completed step" href='/register_artist/'>
+      <div class="content">
+        <div class="title">약관동의</div>
+      </div>
+    </a>
+    <div class="active step">
+      <div class="content">
+        <div class="title">작가 이메일 등록</div>
+      </div>
+    </div>
+    <div class="disabled step">
+      <div class="content">
+        <div class="title">작가 정보 입력</div>
+      </div>
+    </div>
+    <div class="disabled step">
+      <div class="content">
+        <div class="title">작품 등록</div>
+      </div>
+    </div>
+    <div class="disabled step">
+      <div class="content">
+        <div class="title">정보 확인</div>
+      </div>
+    </div>
+  </div>
+  <div class="ui attached segment">
+    <div class="ui large form">
+      <form id="form1" method="post" action="/register_artist/3/">
+      {% csrf_token %}
+      <input type="hidden" name="step" value="2">
+
+      {% if error_msg == "not_matched_password" %}
+      <div class="ui negative message">
+        <div class="header">
+          이미 등록된 이메일 주소이지만, 암호가 맞질 않습니다. 
+        </div>
+        <p>해당 이메일({{email}})은 이미 등록이 되어 있습니다. 등록된 메일의 경우 기존 등록시 암호를 입력하시면 등록하셨던 내용을 수정하셔서 등록을 하실 수 있습니다. </p>
+        <p>기존 등록시 사용하신 암호를 입력하여 주시기 바랍니다.</p>
+      </div>
+      {% endif %}
+
+      <div class="two fields">
+        <div class="required field">
+          <label>이메일</label>
+          <input type="text" placeholder="Email" id="id_email" name="email" value="{{email}}">
+        </div>
+      </div>
+      <div class="two fields">
+        <div class="required field">
+          <label>암호</label>
+          <input type="password" placeholder="암호" id="id_password" name="password">
+        </div>
+        <div class="required field">
+          <label>암호확인</label>
+          <input type="password" placeholder="암호확인" id="cf_password">
+        </div>
+      </div>
+      
+
+      <div class="ui success message">
+        <div class="header">Form Completed</div>
+        <p>You're all signed up for the newsletter.</p>
+      </div>
+
+      </form>
+
+      <button class="ui left labeled icon button" id="back">
+        <i class="left arrow icon"></i>
+        이전단계로 가기
+      </button>
+      <button class="ui labeled icon button" id="cancel">
+        <i class="pause icon"></i>
+        취소
+      </button>
+      <button class="ui right labeled icon positive button" id="confirm">
+        <i class="right arrow icon"></i>
+        다음단계로 가기
+      </button>
+      
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
