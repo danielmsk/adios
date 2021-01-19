@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+{% load upload_tags %}
+
+
+{% block script %}
+<!-- Bootstrap styles -->
+<!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"> -->
+<!-- Generic page styles -->
+<link rel="stylesheet" href="/static/css/style.css">
+<!-- blueimp Gallery styles -->
+<link rel="stylesheet" href="/static/css/blueimp-gallery.min.css">
+<!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+<link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
+<!-- CSS adjustments for browsers with JavaScript disabled -->
+<noscript><link rel="stylesheet" href="/static/css/jquery.fileupload-ui-noscript.css"></noscript>
+{% endblock %}
+
+{% block js %}
+
+  movie_idx = 1;
+
+  $("#confirm").click(function() {
+    flag = true;
+
+    //  if ($.trim($("#id_kname").val()) == ''){
+    //   $('#modal_msg').html('<b>성명</b> 입력은 필수입니다. <b>성명</b>을 입력해 주세요.');
+    //   $('.ui.mini.modal').modal('show');
+    //   $("#id_kname").focus();
+    //   flag = false;
+    // }else if ($.trim($("#id_ename").val()) == ''){
+    //   $('#modal_msg').html('<b>영문이름</b> 입력은 필수입니다. <b>영문이름</b>을 입력해 주세요.');
+    //   $('.ui.mini.modal').modal('show');
+    //   $("#id_ename").focus();
+    //   flag = false;
+    // }else if ($.trim($("#id_address").val()) == ''){
+    //   $('#modal_msg').html('<b>작업장 주소</b> 입력은 필수입니다. <b>작업장 주소</b>를 입력해 주세요.');
+    //   $('.ui.mini.modal').modal('show');
+    //   $("#id_address").focus();
+    //   flag = false;
+    // } 
+
+    if (flag){
+      $( "#fileupload" ).attr('action', '/register_artist/5/');
+      $( "#fileupload" ).submit();
+    };
+  });
+
+  $("#back").click(function() {
+    window.history.back();
+  });
+
+  $("#cancle").click(function() {
+    window.location = '/';
+  });
+
+  $('.menu .item').tab();
+  $('select.dropdown').dropdown();
+
+  $('#add_movie').click(function() {
+    movie_idx = movie_idx + 1;
+    addrow = '<tr>';
+    addrow = addrow + '<td><div class="field">';
+    addrow = addrow + '<select name="source" class="ui dropdown">';
+    addrow = addrow + '<option value="">영상 소스를 선택해 주세요.</option>';
+    addrow = addrow + '<option value="YouTube">YouTube</option>';
+    addrow = addrow + '<option value="Vimeo">Vimeo</option>';
+    addrow = addrow + '</select>';
+    addrow = addrow + '</div>';
+    addrow = addrow + '</td>';
+    addrow = addrow + '<td><input type="text" name="movie_videoid_' + movie_idx +'" maxlength="200" placeholder="비디오 ID"></td>';
+    addrow = addrow + '<td><input type="text" name="movie_title_' + movie_idx +'" maxlength="100" placeholder="제목"></td>';
+    addrow = addrow + '<td><input type="text" name="movie_size_' + movie_idx +'" maxlength="100" placeholder="사이즈"></td>';
+    addrow = addrow + '<td><input type="text" name="movie_material_' + movie_idx +'" maxlength="100" placeholder="재료"></td>';
+    addrow = addrow + '<td><input type="text" name="movie_year_' + movie_idx +'" maxlength="100" placeholder="제작년도"></td>';
+    addrow = addrow + '<td>';
+    addrow = addrow + '<button type="button" class="ui red button remCF">';
+    addrow = addrow + '<i class="ui icon trash"></i>';
+    addrow = addrow + '</button>';
+    addrow = addrow + '</td>';
+    addrow = addrow + '</tr>';
+    <!-- $('#movietable tr:last').after(addrow); -->
+    $("#movietable tbody").append(addrow);
+  });
+
+  $("#movietable").on('click','.remCF',function(){
+      $(this).parent().parent().remove();
+  });
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="ui aligned container">
+
+  <div class="ui small breadcrumb">
+    <a class="section" href="/">홈</a>
+    <span class="divider">/</span>
+    <a class="section">작가</a>
+    <span class="divider">/</span>
+    <div class="active section">작가 등록</div>
+  </div>
+
+  <h1 class="ui dividing header">작가 등록</h1>
+
+  <div class="ui ordered five top attached steps">
+    <a class="completed step" href='/register_artist/'>
+      <div class="content">
+        <div class="title">약관동의</div>
+      </div>
+    </a>
+    <div class="completed step">
+      <div class="content">
+        <div class="title">작가 이메일 등록</div>
+      </div>
+    </div>
+    <div class="completed step">
+      <div class="content">
+        <div class="title">작가 정보 입력</div>
+      </div>
+    </div>
+    <div class="active step">
+      <div class="content">
+        <div class="title">작품 등록</div>
+      </div>
+    </div>
+    <div class="disabled step">
+      <div class="content">
+        <div class="title">정보 확인</div>
+      </div>
+    </div>
+  </div>
+  <div class="ui attached segment">
+
+    <div class="ui blue message">작품 이미지와 동영상을 입력하실 수 있습니다. 
+
+      <ul>
+        <li>이미지 파일을 추가하신후 업로드 버튼을 클릭해 주셔야 이미지가 업로드가 완료됩니다.</li>
+        <li>동영상의 경우 <a href='http://www.youtube.com' target=_blank>유튜브(youtube)</a>와 <a href='http://www.vimeo.com' target=_blank>비메오(vimeo)</a>에 업로드된 영상만 추가하실 수 있습니다.</li>
+      </ul>
+    </div>
+
+    <div class="ui large form">
+
+      <form id="fileupload" method="post" action="." enctype="multipart/form-data">{% csrf_token %}
+      <input type="hidden" name="email" id="email" value="{{email}}">
+      <input type="hidden" name="step" id="step" value="4">
+
+      <div class="ui top attached tabular menu">
+        <div class="active item" data-tab="image">이미지</div>
+        <div class="item" data-tab="movie">동영상 (Youtube/Vimeo)</div>
+      </div>
+
+      <!---이미지 입력 탭--->
+      <div class="ui bottom attached active tab segment" data-tab="image">
+        <!-- The file upload form used as target for the file upload widget -->
+        
+            <!-- Redirect browsers with JavaScript disabled to the origin page -->
+            <!--<noscript><input type="hidden" name="redirect" value="http://blueimp.github.io/jQuery-File-Upload/"></noscript>-->
+            <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+            <div class="row fileupload-buttonbar">
+                <div class="col-lg-7">
+                    <!-- The fileinput-button span is used to style the file input field as button -->
+                    <span class="btn btn-success fileinput-button">
+                        <i class="icon plus"></i>
+                        <span>작품 이미지 파일 추가</span>
+                        <input type="file" name="file" multiple>
+                    </span>
+                    <button type="submit" class="btn btn-primary start">
+                        <i class="icon upload"></i>
+                        <span>파일 업로드 시작</span>
+                    </button>
+                    <button type="reset" class="btn btn-warning cancel">
+                        <i class="icon ban"></i>
+                        <span>업로드 취소</span>
+                    </button>
+                    <button type="button" class="btn btn-danger delete">
+                        <i class="icon trash"></i>
+                        <span>삭제</span>
+                    </button>
+                    <input type="checkbox" class="toggle">
+                    <!-- The loading indicator is shown during file processing -->
+                    <span class="fileupload-loading"></span>
+                </div>
+                <!-- The global progress information -->
+                <div class="col-lg-5 fileupload-progress fade">
+                    <!-- The global progress bar -->
+                    <div class="ui progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                        <div class="bar" style="width:0%;"></div>
+                    </div>
+                    <!-- The extended global progress information -->
+                    <div class="progress-extended">&nbsp;</div>
+                </div>
+            </div>
+            <!-- The table listing the files available for upload/download -->
+            <div class="ui small form">
+            <table role="presentation" class="ui very basic celled striped table"><tbody class="files">
+              <tr><th></th><th>작품이미지</th><th>파일이름</th><th>제목</th><th>사이즈</th><th>재료</th><th>제작년도</th><th>삭제</th></tr>
+            </tbody></table>
+            </div>
+
+    </div>
+    <!---동영상 입력 탭--->
+    <div class="ui bottom attached tab segment" data-tab="movie">
+      <div class="two fields">
+        <button type="button" class="btn btn-success" id="add_movie">
+            <i class="icon plus"></i>
+            <span>동영상 필드 추가</span>
+        </button>
+      </div>
+        
+
+      <div class="ui small form">
+      <table id="movietable" class="ui very basic celled striped table"><tbody>
+        <tr><th>영상 소스</th><th>비디오ID</th><th>제목</th><th>사이즈</th><th>재료</th><th>제작년도</th></tr>
+        {% for m in movielist %}
+        <tr>
+          <td>
+            <div class="field">
+              <select name="movie_source_1" class="ui dropdown">
+                <option value="">영상 소스를 선택해 주세요.</option>
+                <option value="YouTube" {% if m.source == "YouTube" %}selected{% endif %}>YouTube</option>
+                <option value="Vimeo" {% if m.source == "Vimeo" %}selected{% endif %}>Vimeo</option>
+              </select>
+            </div>
+          </td>
+          <td><input type="text" name="movie_videoid_pk{{m.id}}" maxlength="200" placeholder="비디오 ID" value="{{m.videoid}}"></td>
+          <td><input type="text" name="movie_title_pk{{m.id}}" maxlength="100" placeholder="제목" value="{{m.title}}"></td>
+          <td><input type="text" name="movie_size_pk{{m.id}}" maxlength="100" placeholder="사이즈" value="{{m.size}}"></td>
+          <td><input type="text" name="movie_material_pk{{m.id}}" maxlength="100" placeholder="재료" value="{{m.material}}"></td>
+          <td><input type="text" name="movie_year_pk{{m.id}}" maxlength="100" placeholder="제작년도" value="{{m.year}}"></td>
+        </tr>
+
+        {% endfor %}
+
+        <tr>
+          <td>
+            <div class="field">
+              <select name="movie_source_1" class="ui dropdown">
+                <option value="">영상 소스를 선택해 주세요.</option>
+                <option value="YouTube">YouTube</option>
+                <option value="Vimeo">Vimeo</option>
+              </select>
+            </div>
+          </td>
+          <td><input type="text" name="movie_videoid_1" maxlength="200" placeholder="비디오 ID" value="{{m.videoid}}"></td>
+          <td><input type="text" name="movie_title_1" maxlength="100" placeholder="제목" value="{{m.title}}"></td>
+          <td><input type="text" name="movie_size_1" maxlength="100" placeholder="사이즈" value="{{m.size}}"></td>
+          <td><input type="text" name="movie_material_1" maxlength="100" placeholder="재료" value="{{m.material}}"></td>
+          <td><input type="text" name="movie_year_1" maxlength="100" placeholder="제작년도" value="{{m.year}}"></td>
+          
+        </tr>
+      </tbody></table>
+      </div>
+
+        
+      
+    </div>
+
+    </form>
+
+      <p>&nbsp;</p>
+
+
+      <button class="ui left labeled icon button" id="back">
+        <i class="left arrow icon"></i>
+        이전단계로 가기
+      </button>
+      <button class="ui labeled icon button" id="cancel">
+        <i class="pause icon"></i>
+        취소
+      </button>
+      <button class="ui right labeled icon positive button" id="confirm">
+        <i class="right arrow icon"></i>
+        다음단계로 가기
+      </button>
+      
+    </div>
+  </div>
+
+</div>
+
+
+
+
+
+<!-- The blueimp Gallery widget -->
+<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+</div>
+{% upload_js %}
+
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> -->
+<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<script src="/static/js/vendor/jquery.ui.widget.js"></script>
+<!-- The Templates plugin is included to render the upload/download listings -->
+<script src="/static/js/tmpl.min.js"></script>
+<!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+<script src="/static/js/load-image.min.js"></script>
+<!-- The Canvas to Blob plugin is included for image resizing functionality -->
+<script src="/static/js/canvas-to-blob.min.js"></script>
+<!-- Bootstrap JS is not required, but included for the responsive demo navigation -->
+<!-- <script src="/static/js/bootstrap.min.js"></script> -->
+<!-- blueimp Gallery script -->
+<script src="/static/js/jquery.blueimp-gallery.min.js"></script>
+<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+<script src="/static/js/jquery.iframe-transport.js"></script>
+<!-- The basic File Upload plugin -->
+<script src="/static/js/jquery.fileupload.js"></script>
+<!-- The File Upload processing plugin -->
+<script src="/static/js/jquery.fileupload-process.js"></script>
+<!-- The File Upload image preview & resize plugin -->
+<script src="/static/js/jquery.fileupload-image.js"></script>
+<!-- The File Upload audio preview plugin -->
+<script src="/static/js/jquery.fileupload-audio.js"></script>
+<!-- The File Upload video preview plugin -->
+<script src="/static/js/jquery.fileupload-video.js"></script>
+<!-- The File Upload validation plugin -->
+<script src="/static/js/jquery.fileupload-validate.js"></script>
+<!-- The File Upload user interface plugin -->
+<script src="/static/js/jquery.fileupload-ui.js"></script>
+<!-- The main application script -->
+<script src="/static/js/main_fileupload_web.js"></script>
+<script src="/static/js/locale.js"></script>
+<script src="/static/js/csrf.js"></script>
+<!-- The XDomainRequest Transport is included for cross-domain file deletion for IE8+ -->
+<!--[if gte IE 8]>
+<script src="/static/js/cors/jquery.xdr-transport.js"></script>
+<![endif]-->
+{% endblock %}

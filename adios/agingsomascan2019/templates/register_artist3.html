@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block script %}
+{% endblock %}
+
+{% block js %}
+
+  $("#confirm").click(function() {
+    flag = true;
+
+    if ($.trim($("#id_kname").val()) == ''){
+      $('#modal_msg').html('<b>성명</b> 입력은 필수입니다. <b>성명</b>을 입력해 주세요.');
+      $('.ui.mini.modal').modal('show');
+      $("#id_kname").focus();
+      flag = false;
+    }else if ($.trim($("#id_ename").val()) == ''){
+      $('#modal_msg').html('<b>영문이름</b> 입력은 필수입니다. <b>영문이름</b>을 입력해 주세요.');
+      $('.ui.mini.modal').modal('show');
+      $("#id_ename").focus();
+      flag = false;
+    }else if ($.trim($("#id_address").val()) == ''){
+      $('#modal_msg').html('<b>작업장 주소</b> 입력은 필수입니다. <b>작업장 주소</b>를 입력해 주세요.');
+      $('.ui.mini.modal').modal('show');
+      $("#id_address").focus();
+      flag = false;
+    }
+
+    if (flag){
+      $( "#form1" ).submit();
+    };
+  });
+
+  $("#back").click(function() {
+    window.history.back();
+  });
+
+  $("#cancle").click(function() {
+    window.location = '/';
+  });
+{% endblock %}
+
+{% block title %}{{TITLE}}{% endblock %}
+
+{% block content %}
+
+
+<div class="ui mini modal">
+  <i class="close icon"></i>
+  <div class="header">
+    작가 정보 입력
+  </div>
+  <div class="content">
+    <div class="description">
+      <span id="modal_msg"></span>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="ui positive left labeled icon button">
+      확인
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="ui aligned container">
+
+
+  <div class="ui small breadcrumb">
+    <a class="section" href="/">홈</a>
+    <span class="divider">/</span>
+    <a class="section">작가</a>
+    <span class="divider">/</span>
+    <div class="active section">작가 등록</div>
+  </div>
+
+  <h1 class="ui dividing header">작가 등록</h1>
+
+  <div class="ui ordered five top attached steps">
+    <a class="completed step" href='/register_artist/'>
+      <div class="content">
+        <div class="title">약관동의</div>
+      </div>
+    </a>
+    <div class="completed step">
+      <div class="content">
+        <div class="title">작가 이메일 등록</div>
+      </div>
+    </div>
+    <div class="active step">
+      <div class="content">
+        <div class="title">작가 정보 입력</div>
+      </div>
+    </div>
+    <div class="disabled step">
+      <div class="content">
+        <div class="title">작품 등록</div>
+      </div>
+    </div>
+    <div class="disabled step">
+      <div class="content">
+        <div class="title">정보 확인</div>
+      </div>
+    </div>
+  </div>
+  <div class="ui attached segment">
+    <div class="ui large form">
+
+      <form id="form1" method="post" action="/register_artist/4/" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="step" value="3">
+      <input type="hidden" name="email" value="{{email}}">
+      <div class="two fields">
+        <div class="required field">
+          <label>성명</label>
+          <input type="text" placeholder="성명 (예: 홍길동)" id="id_kname" name="kname" value="{{artist.kname}}">
+        </div>
+        <div class="required field">
+          <label>영문이름</label>
+          <input type="text" placeholder="영문이름 (예: Gildong Hong)" id="id_ename" name="ename" value="{{artist.ename}}">
+        </div>
+      </div>
+
+      <div class="fields">
+        <div class="required field">
+          <label>작가 사진</label>
+          {% if artist.picture|length > 0 %}
+            <img src="/media/{{artist.picture}}" class="ui small image"><br>
+          {% endif %}
+          <input type="file" id="file" name="picture">
+        </div>
+      </div>
+      <div class="fields">
+        <div class="required twelve wide field">
+          <label>작업장 주소</label>
+          <input type="text" placeholder="작업장 주소 (예: 서울 강북구)" id="id_address" name="address" value="{{artist.address}}">
+        </div>
+      </div>
+      <div class="fields">
+        <div class="twelve wide field">
+          <label>학력</label>
+          <textarea spellcheck="false" placeholder="예) 2010~2014 한국대학교 서양학과" id="id_education" name="education">{{artist.education}}</textarea>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="twelve wide field">
+          <label>경력 (수상/전시/레지던시/아트페어/작품소장)</label>
+          <textarea spellcheck="false" placeholder="예) 2014 제5회 OOOOO상" id="id_career" name="career">{{artist.career}}</textarea>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="twelve wide field">
+          <label>개인전</label>
+          <textarea spellcheck="false" placeholder="예) 2019 ABC아트센터, 서울" id="id_exhibit_personal" name="exhibit_personal">{{artist.exhibit_personal}}</textarea>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="twelve wide field">
+          <label>단체전</label>
+          <textarea spellcheck="false" placeholder="예) 2018 국제미술페스타, ABC미술관, 서울" id="id_exhibit_team" name="exhibit_team">{{artist.exhibit_team}}</textarea>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="twelve wide field">
+          <label>추가정보</label>
+          <textarea spellcheck="false" placeholder="추가정보" id="id_memo" name="memo">{{artist.memo}}</textarea>
+        </div>
+      </div>
+
+      <div class="ui success message">
+        <div class="header">Form Completed</div>
+        <p>You're all signed up for the newsletter.</p>
+      </div>
+
+      </form>
+
+      <button class="ui left labeled icon button" id="back">
+        <i class="left arrow icon"></i>
+        이전단계로 가기
+      </button>
+      <button class="ui labeled icon button" id="cancel">
+        <i class="pause icon"></i>
+        취소
+      </button>
+      <button class="ui right labeled icon positive button" id="confirm">
+        <i class="right arrow icon"></i>
+        다음단계로 가기
+      </button>
+      
+
+      <!-- {{form}} -->
+
+    </div>
+  </div>
+
+
+  
+
+
+  
+  
+
+</div>
+
+{% endblock %}

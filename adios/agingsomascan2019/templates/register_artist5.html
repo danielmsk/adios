@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}{{TITLE}}{% endblock %}
+
+{% block script %}
+<link rel="stylesheet" href="/static/css/blueimp-gallery.css" />
+<link rel="stylesheet" href="/static/css/blueimp-gallery-indicator.css" />
+<link rel="stylesheet" href="/static/css/blueimp-gallery-video.css" />
+{% endblock %}
+
+
+{% block script_end %}
+<script src="/static/js/blueimp-helper.js"></script>
+<script src="/static/js/blueimp-gallery.js"></script>
+<script src="/static/js/blueimp-gallery-fullscreen.js"></script>
+<script src="/static/js/blueimp-gallery-indicator.js"></script>
+<script src="/static/js/blueimp-gallery-video.js"></script>
+<script src="/static/js/blueimp-gallery-vimeo.js"></script>
+<script src="/static/js/blueimp-gallery-youtube.js"></script>
+<script src="/static/js/jquery.blueimp-gallery.js"></script>
+{% endblock %}
+
+{% block js %}
+
+
+  $("#confirm").click(function() {
+    window.location = '/';
+  });  
+
+  $("#back").click(function() {
+    window.history.back();
+  });
+
+  $("#cancle").click(function() {
+    window.location = '/';
+  });
+
+  $("#btn_gallary").click(function() {
+    window.location = '/';
+  });
+
+
+
+
+  $(function () {
+    'use strict'
+
+    // Load demo images from flickr:
+    $.ajax({
+      url: 'https://api.flickr.com/services/rest/',
+      data: {
+        format: 'json',
+        method: 'flickr.interestingness.getList',
+        // eslint-disable-next-line camelcase
+        api_key: '7617adae70159d09ba78cfec73c13be3'
+      },
+      dataType: 'jsonp',
+      jsonp: 'jsoncallback'
+    }).done(function (result) {
+      var carouselLinks = []
+      var linksContainer = $('#links')
+      var baseUrl
+      // Add the demo images as links with thumbnails to the page:
+      $.each(result.photos.photo, function (index, photo) {
+        baseUrl =
+          'https://farm' +
+          photo.farm +
+          '.static.flickr.com/' +
+          photo.server +
+          '/' +
+          photo.id +
+          '_' +
+          photo.secret
+        $('<a/>')
+          .append($('<img>').prop('src', baseUrl + '_s.jpg'))
+          .prop('href', baseUrl + '_b.jpg')
+          .prop('title', photo.title)
+          .attr('data-gallery', '')
+          .appendTo(linksContainer)
+        carouselLinks.push({
+          href: baseUrl + '_c.jpg',
+          title: photo.title
+        })
+      })
+      // Initialize the Gallery as image carousel:
+      // eslint-disable-next-line new-cap
+      blueimp.Gallery(carouselLinks, {
+        container: '#blueimp-image-carousel',
+        carousel: true
+      })
+    })
+
+    // Initialize the Gallery as video carousel:
+    // eslint-disable-next-line new-cap
+    blueimp.Gallery(
+      [
+      {% for p in picturelist %}
+        {
+          title: '{{p.title}}',
+          href: '/media/{{p.file}}',
+          type: 'image/jpeg',
+          thumbnail: '/media/{{p.file}}'
+        },
+      {% endfor %}
+      {% for m in movielist %}
+        {
+          title: '{{m.title}}',
+          href: 'https://www.youtube.com/watch?v={{m.videoid}}',
+          type: 'text/html',
+          youtube: '{{m.videoid}}',
+          poster: 'https://img.youtube.com/vi/{{m.videoid}}/maxresdefault.jpg'
+        },
+      {% endfor %}
+      ],
+      {
+        container: '#blueimp-video-carousel',
+        carousel: true
+      }
+    )
+  })
+
+
+  
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="ui aligned container">
+
+
+  <div class="ui small breadcrumb">
+    <a class="section" href="/">홈</a>
+    <span class="divider">/</span>
+    <a class="section">작가</a>
+    <span class="divider">/</span>
+    <div class="active section">작가 등록</div>
+  </div>
+
+  <h1 class="ui dividing header">작가 등록</h1>
+
+  <div class="ui ordered five top attached steps">
+    <a class="completed step" href='/register_artist/'>
+      <div class="content">
+        <div class="title">약관동의</div>
+      </div>
+    </a>
+    <div class="completed step">
+      <div class="content">
+        <div class="title">작가 이메일 등록</div>
+      </div>
+    </div>
+    <div class="completed step">
+      <div class="content">
+        <div class="title">작가 정보 입력</div>
+      </div>
+    </div>
+    <div class="completed step">
+      <div class="content">
+        <div class="title">작품 등록</div>
+      </div>
+    </div>
+    <div class="active step">
+      <div class="content">
+        <div class="title">정보 확인</div>
+      </div>
+    </div>
+  </div>
+  <div class="ui attached segment">
+
+    <div class="ui items">
+    <div class="item">
+      <div class="image">
+        <img src="/media/{{artist.picture}}">
+      </div>
+      <div class="content">
+        <h1>{{artist.kname}} ({{artist.ename}})</h1>
+        
+        <b>이메일</b>: {{artist.email}}<br>
+        <b>작업장 주소</b>: {{artist.address}}<br>
+        
+
+        <div class="ui segment">
+        <h3>학력</h3>
+        <span>{{artist.education|linebreaksbr}}</span>
+        </div>
+
+
+        <div class="ui segment">
+        <h3>경력</h3>
+        <span>{{artist.career|linebreaksbr}}</span>
+        </div>
+
+        <div class="ui segment">
+        <h3>개인전</h3>
+        <span>{{artist.exhibit_personal|linebreaksbr}}</span>
+        </div>
+
+        <div class="ui segment">
+        <h3>단체전</h3>
+        <span>{{artist.exhibit_team|linebreaksbr}}</span>
+        </div>
+
+        <div class="ui segment">
+        <h3>추가정보</h3>
+        <span>{{artist.memo|linebreaksbr}}</span>
+        </div>
+        
+
+        <div class="ui segment">
+        <h3>작품 ({{ picturelist|length }} 이미지, {{ movielist|length }} 동영상)</h3>
+
+        
+        <span>
+          
+          <div class="ui cards">
+          {% for p in picturelist %}
+          <div class="ui green card">
+            <a class="image" href="#link">
+              <img src="/media/{{p.file}}">
+            </a>
+            <div class="content">
+              <a class="header" href="#link">제목: {{p.title}}</a>
+              <div class="meta">
+                재료: <b>{{p.material}}</b><br>
+                사이즈: <b>{{p.size}}</b><br>
+                제작년도: <b>{{p.year}}</b><br>
+                파일이름: <b>{{p.file}}</b><br>
+                파일타입: 이미지
+              </div>
+            </div>
+          </div>
+          {% endfor %} 
+          {% for m in movielist %}
+          <div class="ui green card">
+            <a class="image" href="#link">
+              <img src="https://img.youtube.com/vi/{{m.videoid}}/maxresdefault.jpg">
+            </a>
+            <div class="content">
+              <a class="header" href="#link">제목: {{m.title}}</a>
+              <div class="meta">
+                재료: <b>{{m.material}}</b><br>
+                사이즈: <b>{{m.size}}</b><br>
+                제작년도: <b>{{m.year}}</b><br>
+                파일이름: <b>{{m.file}}</b><br>
+                파일타입: 동영상
+              </div>
+            </div>
+          </div>
+          {% endfor %}  
+          </div>
+
+
+        </span>
+
+
+        <p>&nbsp;</p>
+
+      </div>
+
+      <div class="ui inverted segment">
+        <h3>갤러리뷰</h3>
+
+        <!-- <div class="ui inverted labeled button" tabindex="0" id="btn_gallary">
+          <div class="ui green button">
+            <i class="images icon"></i> 갤러리뷰 보기
+          </div>
+          <a class="ui basic green left pointing label">
+            {{ picturelist|length }} 이미지, {{ movielist|length }} 동영상
+          </a>
+        </div> -->
+
+        
+        <div
+      id="blueimp-video-carousel"
+      class="blueimp-gallery blueimp-gallery-controls blueimp-gallery-carousel"
+    >
+      <div class="slides"></div>
+      <h3 class="title"></h3>
+      <a class="prev">‹</a>
+      <a class="next">›</a>
+      <a class="play-pause"></a>
+    </div>
+
+
+      </div>  
+      </div>
+    </div>
+  </div>
+
+
+
+    <div class="ui large form">
+      
+
+
+      <button class="ui left labeled icon button" id="back">
+        <i class="left arrow icon"></i>
+        이전단계로 가기
+      </button>
+      <!-- <button class="ui labeled icon button" id="cancel">
+        <i class="pause icon"></i>
+        취소
+      </button> -->
+      <button class="ui right labeled icon positive button" id="confirm">
+        <i class="right arrow icon"></i>
+        완료하고 홈으로 가기
+      </button>
+
+      
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
